@@ -63,13 +63,14 @@
         /* ── Trigger (selo sobre foto) ── */
         @keyframes q-shake { 0%,50%,100%{transform:rotate(0deg)} 10%,30%{transform:rotate(-10deg)} 20%,40%{transform:rotate(10deg)} }
         .q-btn-trigger-ia {
-            position: absolute; top: 14px; right: 14px; z-index: 100;
-            background: none; border: none; padding: 0; cursor: pointer;
-            width: 70px; height: 70px;
-            display: flex; align-items: center; justify-content: center;
+            position: fixed !important; z-index: 999998 !important;
+            background: none !important; border: none !important; padding: 0 !important; cursor: pointer !important;
+            width: 70px !important; height: 70px !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
             filter: drop-shadow(0 3px 10px rgba(0,0,0,0.22));
             animation: q-shake 3s infinite;
             transition: filter 0.2s;
+            visibility: hidden;
         }
         .q-btn-trigger-ia:hover { filter: drop-shadow(0 6px 18px rgba(0,0,0,0.32)); }
         .q-btn-trigger-ia img { width: 100%; height: 100%; object-fit: contain; }
@@ -619,29 +620,56 @@
 
         const imgContainers = ['.product-images', '.product-image-section', '.product-photo', '.gallery-main', '.product-gallery__main', '.product-gallery', '.product-gallery img', '.product-image img', '.product-image-column', '.product-image-main', '[data-component="product.gallery"]', '[data-component="product-images"]', '.swiper-container .swiper-slide-active', '.swiper-slide-active', '.js-product-slide', '.js-swiper-product', '[data-store^="product-image-"]', '.product__media-wrapper', '.product-gallery__media', '.product__media', '.product-media-container', '[data-media-id]', '.product__media-item', '.product-single__media', '.media-gallery'];
 
-        function tryPlaceTriggerBtn() {
-            // 1ª prioridade: container que tenha <img> dentro (evita cair em slide de vídeo)
+        // Anexa ao body com position:fixed e atualiza posição via bounding rect (resiste a breakpoints)
+        document.body.appendChild(openBtn);
+        let trackedImgEl = null;
+
+        function findVisibleImageEl() {
+            // Procura em ordem de prioridade: containers conhecidos com img visível
             for (const sel of imgContainers) {
                 const els = document.querySelectorAll(sel);
                 for (const el of els) {
-                    if (el.querySelector('img')) {
-                        if (window.getComputedStyle(el).position === 'static') el.style.position = 'relative';
-                        el.appendChild(openBtn);
-                        return true;
-                    }
+                    const rect = el.getBoundingClientRect();
+                    const visible = rect.width > 50 && rect.height > 50 && window.getComputedStyle(el).visibility !== 'hidden' && window.getComputedStyle(el).display !== 'none';
+                    if (!visible) continue;
+                    const img = el.tagName === 'IMG' ? el : el.querySelector('img');
+                    if (img) return el;
                 }
             }
-            // 2ª prioridade: qualquer container correspondente
-            for (const sel of imgContainers) {
-                const el = document.querySelector(sel);
-                if (el) {
-                    if (window.getComputedStyle(el).position === 'static') el.style.position = 'relative';
-                    el.appendChild(openBtn);
-                    return true;
-                }
+            // Fallback: qualquer img grande na página de produto
+            for (const img of document.querySelectorAll('img')) {
+                const rect = img.getBoundingClientRect();
+                if (rect.width > 200 && rect.height > 200) return img;
             }
-            return false;
+            return null;
         }
+
+        function updateTriggerPosition() {
+            const target = findVisibleImageEl();
+            if (!target) {
+                openBtn.style.visibility = 'hidden';
+                return false;
+            }
+            trackedImgEl = target;
+            const rect = target.getBoundingClientRect();
+            const btnSize = 70;
+            const margin = 14;
+            // Posiciona no canto superior direito da imagem
+            openBtn.style.top = (rect.top + margin) + 'px';
+            openBtn.style.left = (rect.right - btnSize - margin) + 'px';
+            openBtn.style.visibility = 'visible';
+            return true;
+        }
+
+        function tryPlaceTriggerBtn() {
+            return updateTriggerPosition();
+        }
+
+        // Atualiza posição em scroll/resize
+        window.addEventListener('scroll', updateTriggerPosition, { passive: true });
+        window.addEventListener('resize', updateTriggerPosition);
+        // Re-checa periodicamente caso DOM mude
+        setInterval(updateTriggerPosition, 1000);
 
         if (!tryPlaceTriggerBtn()) {
             // Container não pronto ainda (ex: após F5 no mobile).
