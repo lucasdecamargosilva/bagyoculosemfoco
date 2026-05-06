@@ -221,7 +221,7 @@
         .q-face-placeholder i { font-size: 72px; color: #d0d0d0; }
         .q-product-thumbs {
             display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 8px;
-            -webkit-overflow-scrolling: touch;
+            -webkit-overflow-scrolling: touch; justify-content: center;
         }
         .q-product-thumbs::-webkit-scrollbar { display: none; }
         .q-product-thumb {
