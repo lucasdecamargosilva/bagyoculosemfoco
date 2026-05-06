@@ -50,11 +50,12 @@
 
         :root {
             --c-bg: #ffffff;
-            --c-surface: #f7f6f4;
+            --c-surface: #fff8e6;
             --c-ink: #111111;
             --c-muted: #999;
-            --c-line: #e8e8e8;
-            --c-accent: #111111;
+            --c-line: #f0d77a;
+            --c-accent: #f5a623;
+            --c-brand: #f5a623;
             --c-danger: #cc3333;
             --font-display: 'Bebas Neue', sans-serif;
             --font-body: 'DM Sans', sans-serif;
@@ -726,9 +727,12 @@
         });
 
         // Posiciona acima do botão de compra
-        const buyBtn = document.querySelector('.js-addtocart, .btn-add-to-cart, [data-component="product.add-to-cart"]');
+        const buyBtn = document.querySelector('.product-buy-button, .product-buy button, .product-buy [type="submit"], .js-addtocart, .btn-add-to-cart, [data-component="product.add-to-cart"]');
         if (buyBtn) {
-            buyBtn.parentNode.insertBefore(inlineBtn, buyBtn);
+            let target = buyBtn;
+            const buyContainer = buyBtn.closest('.product-buy, .row');
+            if (buyContainer && buyContainer.parentNode) target = buyContainer;
+            target.parentNode.insertBefore(inlineBtn, target);
         } else {
             const variantsContainer = document.querySelector('.js-product-variants');
             if (variantsContainer) {
