@@ -891,38 +891,69 @@
             var section = document.getElementById('q-related-products');
             if (!grid || !section) return;
 
-            var items = document.querySelectorAll('.product-related .product-item, .related-products .product-item, [data-component="products.list"] .product-item');
-            if (!items.length) items = document.querySelectorAll('.js-swiper-related .js-item-product');
-            if (!items.length) items = document.querySelectorAll('.js-item-product');
+            // Bagy/Dooca + Nuvemshop selectors
+            var sel = [
+                '.product-related .product-card', '.product-related .card-product', '.product-related .product-item',
+                '.related-products .product-card', '.related-products .card-product', '.related-products .product-item',
+                '[data-component="products.list"] .product-item',
+                '.js-swiper-related .js-item-product',
+                '.js-item-product',
+                '.product-card', '.card-product'
+            ];
+            var items = [];
+            for (var i = 0; i < sel.length && !items.length; i++) {
+                items = document.querySelectorAll(sel[i]);
+            }
+            if (!items.length) {
+                console.log('[PL] Nenhum produto relacionado encontrado');
+                return;
+            }
+
             var products = [];
+            var prodHref = window.location.pathname;
 
             items.forEach(function(item) {
-                if (products.length >= 3) return;
-                var container = item.querySelector('[data-variants]');
-                if (!container) return;
+                if (products.length >= 4) return;
                 try {
-                    var variants = JSON.parse(container.getAttribute('data-variants'));
-                    if (!variants || !variants.length) return;
-                    var v = variants[0];
-                    var imgRaw = v.image_url || '';
-                    var img = imgRaw ? 'https:' + imgRaw.replace(/\\/g, '').replace('-1024-1024.webp', '-480-0.webp') : '';
-                    var price = v.price_short || '';
-                    // Name from img alt (Nuvemshop sets it reliably)
-                    var imgEl = item.querySelector('img[alt]');
-                    var name = imgEl ? imgEl.getAttribute('alt').trim() : '';
-                    // Link from any anchor pointing to /produtos/
-                    var linkEl = item.querySelector('a[href*="/produtos/"]');
+                    // 1) Link
+                    var linkEl = item.querySelector('a[href]') || (item.tagName === 'A' ? item : null);
                     var link = linkEl ? linkEl.getAttribute('href') : '';
-                    if (img && (name || price)) {
+                    if (!link || link === '#' || link === prodHref) return; // ignora link inválido ou o produto atual
+
+                    // 2) Imagem
+                    var imgEl = item.querySelector('img');
+                    var img = '';
+                    if (imgEl) {
+                        img = imgEl.getAttribute('src') || imgEl.getAttribute('data-src') || imgEl.getAttribute('data-original') || '';
+                        // srcset fallback
+                        if (!img) {
+                            var srcset = imgEl.getAttribute('srcset') || imgEl.getAttribute('data-srcset');
+                            if (srcset) img = srcset.split(',')[0].trim().split(' ')[0];
+                        }
+                    }
+                    if (!img) return;
+
+                    // 3) Nome — tenta multiplos seletores
+                    var nameEl = item.querySelector('.product-name, .card-product-name, .product-title, .card-title, h3, h4, [class*="name"]');
+                    var name = nameEl ? nameEl.textContent.trim() : (imgEl && imgEl.alt ? imgEl.alt.trim() : '');
+
+                    // 4) Preço — tenta multiplos seletores
+                    var priceEl = item.querySelector('.product-price-final .total, .product-price-final .price, .product-price .total, .price-final, .product-price, .card-product-price, [class*="price"]');
+                    var price = priceEl ? priceEl.textContent.trim().replace(/\s+/g, ' ') : '';
+
+                    if (img && name) {
                         products.push({ name: name, img: img, price: price, link: link });
                     }
                 } catch(e) {}
             });
 
-            if (!products.length) return;
+            if (!products.length) {
+                console.log('[PL] Nenhum produto extraído com sucesso');
+                return;
+            }
 
             while (grid.firstChild) grid.removeChild(grid.firstChild);
-            products.forEach(function(p) {
+            products.slice(0, 4).forEach(function(p) {
                 var a = document.createElement('a');
                 a.className = 'q-related-card';
                 a.href = p.link || '#';
@@ -936,9 +967,18 @@
                 nameEl.textContent = p.name;
                 a.appendChild(img);
                 a.appendChild(nameEl);
+                if (p.price) {
+                    var priceEl = document.createElement('span');
+                    priceEl.className = 'q-related-card-name';
+                    priceEl.style.color = 'var(--c-brand)';
+                    priceEl.style.fontWeight = '700';
+                    priceEl.textContent = p.price;
+                    a.appendChild(priceEl);
+                }
                 grid.appendChild(a);
             });
             section.style.display = 'block';
+            console.log('[PL] ' + products.length + ' produtos relacionados carregados');
         }
 
         function showError() {
