@@ -891,8 +891,11 @@
             var section = document.getElementById('q-related-products');
             if (!grid || !section) return;
 
-            // Bagy/Dooca + Nuvemshop selectors
+            // Bagy/Dooca: #product-related com .col-6 / Nuvemshop: outros padrões
             var sel = [
+                '#product-related .col-6, #product-related .col-md-3',
+                '#product-related .product-card', '#product-related .card-product', '#product-related .product-item',
+                '.product-related .col-6, .product-related .col-md-3',
                 '.product-related .product-card', '.product-related .card-product', '.product-related .product-item',
                 '.related-products .product-card', '.related-products .card-product', '.related-products .product-item',
                 '[data-component="products.list"] .product-item',
