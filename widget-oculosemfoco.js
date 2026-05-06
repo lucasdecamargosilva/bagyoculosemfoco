@@ -6,8 +6,8 @@
     window.PROVOU_LEVOU_API_KEY = apiKey;
 
     const WEBHOOK_PROVA = 'https://n8n.segredosdodrop.com/webhook/gerador-oculos';
-    const WEBHOOK_PIX = 'https://n8n.segredosdodrop.com/webhook/oculosemfoco-pix';
-    const WEBHOOK_PIX_STATUS = 'https://n8n.segredosdodrop.com/webhook/oculosemfoco-pix-status';
+    const WEBHOOK_PIX = 'https://n8n.segredosdodrop.com/webhook/cacife-pix';
+    const WEBHOOK_PIX_STATUS = 'https://n8n.segredosdodrop.com/webhook/cacife-pix-status';
     const WEBHOOK_CHECK_LIMIT = 'https://n8n.segredosdodrop.com/webhook/oculosemfoco-check-limit';
     const SIZES_TOP = ['XXP', 'XP', 'P', 'M', 'G', 'XG', 'XXG', '3XG', '4XG', '5XG'];
     const SIZES_BOTTOM = ['36/XXP', '38/XP', '40/P', '42/M', '44/G', '46/XG', '48/XXG', '50/3XG', '52/4XG', '54/5XG'];
@@ -527,7 +527,7 @@
                     <!-- Persistent header (all steps) -->
                     <div id="q-header-provador">
                         <h1>Provador Virtual</h1>
-                        <img src="https://i.ibb.co/MD3B4FQf/Logo-provou-preto-1.png" alt="Óculos em Foco" style="height:48px;width:auto;filter:brightness(0);"/>
+                        <img src="https://cdn.dooca.store/113105/files/oculos-em-foco-loader.png?v=1682338866" alt="Óculos em Foco" style="height:48px;width:auto;filter:brightness(0);"/>
                     </div>
 
                     <!-- Main step -->
