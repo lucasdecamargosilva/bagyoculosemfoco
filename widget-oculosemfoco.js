@@ -219,6 +219,27 @@
         .q-face-frame img { width: 100%; height: 100%; object-fit: cover; display: none; }
         .q-face-placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .q-face-placeholder i { font-size: 72px; color: #d0d0d0; }
+        .q-product-thumbs {
+            display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .q-product-thumbs::-webkit-scrollbar { display: none; }
+        .q-product-thumb {
+            flex: 0 0 72px; width: 72px; height: 72px;
+            background: var(--c-surface); border: 2px solid transparent;
+            padding: 0; cursor: pointer; border-radius: 6px;
+            overflow: hidden; transition: border-color 0.2s, transform 0.15s;
+        }
+        .q-product-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .q-product-thumb:hover { transform: scale(1.04); }
+        .q-product-thumb.selected { border-color: var(--c-brand, var(--c-ink)); }
+        .q-product-thumb.selected::after {
+            content: '✓'; position: absolute; transform: translate(-22px, -68px);
+            background: var(--c-brand, var(--c-ink)); color: #fff;
+            width: 18px; height: 18px; border-radius: 50%;
+            font-size: 11px; line-height: 18px; text-align: center;
+            font-weight: 700;
+        }
         /* Corner marks — clean editorial style */
         .q-face-corner {
             position: absolute; width: 20px; height: 20px;
@@ -481,6 +502,12 @@
                             <span class="q-field-label">Seu WhatsApp</span>
                             <input type="tel" id="q-phone" class="q-input" placeholder="(11) 99999-9999" maxlength="15">
                             <div id="q-phone-error" class="q-status-msg">N&#250;mero inv&#225;lido</div>
+                        </div>
+
+                        <!-- Product image selector -->
+                        <div id="q-photo-selector-group" style="display:none;margin-bottom:20px;">
+                            <p class="q-section-label">Escolha o &#243;culos para experimentar</p>
+                            <div class="q-product-thumbs"></div>
                         </div>
 
                         <!-- Photo section -->
@@ -815,14 +842,44 @@
                 const og = document.querySelector('meta[property="og:image"]')?.content;
                 if (og) uniqueImgs.push(upgradeImgUrl(og));
             }
-            return uniqueImgs.slice(0, 2);
+            return uniqueImgs.slice(0, 8);
         }
 
         function populateImageSelector() {
             const imgs = extractImages();
             const group = document.getElementById('q-photo-selector-group');
-            if (group) group.style.display = 'none';
-            selectedProductImgUrl = imgs[0] || '';
+            if (!group) {
+                selectedProductImgUrl = imgs[0] || '';
+                return;
+            }
+            // Se tem 0 ou 1 imagem, esconde o seletor
+            if (imgs.length < 2) {
+                group.style.display = 'none';
+                selectedProductImgUrl = imgs[0] || '';
+                return;
+            }
+            // Limpa thumbs anteriores
+            const grid = group.querySelector('.q-product-thumbs');
+            grid.innerHTML = '';
+            selectedProductImgUrl = imgs[0];
+            imgs.forEach((src, idx) => {
+                const thumb = document.createElement('button');
+                thumb.type = 'button';
+                thumb.className = 'q-product-thumb' + (idx === 0 ? ' selected' : '');
+                thumb.dataset.url = src;
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = 'Foto ' + (idx + 1);
+                img.loading = 'lazy';
+                thumb.appendChild(img);
+                thumb.addEventListener('click', () => {
+                    grid.querySelectorAll('.q-product-thumb').forEach(t => t.classList.remove('selected'));
+                    thumb.classList.add('selected');
+                    selectedProductImgUrl = src;
+                });
+                grid.appendChild(thumb);
+            });
+            group.style.display = 'block';
         }
 
         function openModal() {
