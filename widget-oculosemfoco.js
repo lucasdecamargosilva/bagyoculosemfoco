@@ -225,7 +225,7 @@
         }
         .q-product-thumbs::-webkit-scrollbar { display: none; }
         .q-product-thumb {
-            flex: 0 0 72px; width: 72px; height: 72px;
+            flex: 0 0 88px; width: 88px; height: 88px;
             background: var(--c-surface); border: 2px solid transparent;
             padding: 0; cursor: pointer; border-radius: 6px;
             overflow: hidden; transition: border-color 0.2s, transform 0.15s;
@@ -234,7 +234,7 @@
         .q-product-thumb:hover { transform: scale(1.04); }
         .q-product-thumb.selected { border-color: var(--c-brand, var(--c-ink)); }
         .q-product-thumb.selected::after {
-            content: '✓'; position: absolute; transform: translate(-22px, -68px);
+            content: '✓'; position: absolute; transform: translate(-22px, -84px);
             background: var(--c-brand, var(--c-ink)); color: #fff;
             width: 18px; height: 18px; border-radius: 50%;
             font-size: 11px; line-height: 18px; text-align: center;
