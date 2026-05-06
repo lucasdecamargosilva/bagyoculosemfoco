@@ -842,7 +842,7 @@
                 const og = document.querySelector('meta[property="og:image"]')?.content;
                 if (og) uniqueImgs.push(upgradeImgUrl(og));
             }
-            return uniqueImgs.slice(0, 8);
+            return uniqueImgs.slice(0, 4);
         }
 
         function populateImageSelector() {
