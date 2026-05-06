@@ -10,68 +10,9 @@
     const WEBHOOK_PIX = 'https://n8n.segredosdodrop.com/webhook/cacife-pix';
     const WEBHOOK_PIX_STATUS = 'https://n8n.segredosdodrop.com/webhook/cacife-pix-status';
     const WEBHOOK_CHECK_LIMIT = 'https://n8n.segredosdodrop.com/webhook/oculosemfoco-check-limit';
-    const SIZES_TOP = ['XXP', 'XP', 'P', 'M', 'G', 'XG', 'XXG', '3XG', '4XG', '5XG'];
-    const SIZES_BOTTOM = ['36/XXP', '38/XP', '40/P', '42/M', '44/G', '46/XG', '48/XXG', '50/3XG', '52/4XG', '54/5XG'];
-    const SIZES_BOTTOM_SW = ['XXP', 'XP', 'P', 'M', 'G', 'XG', 'XXG', '3XG', '4XG', '5XG'];
-
-
-    const GRADE = {
-        regular: [49, 51, 54, 57, 61, 62, 64, 66, 70, 73],
-        oversized: [58, 60, 62, 64, 66, 70, 73, 76, 79, 83],
-        oversizedSS: [58, 61, 63, 67, 70, 74, 78, 82, 87, 92],
-        hoodie: [50, 53, 55, 58, 62, 65, 69, 74, 79, 83],
-        boxyHoodie: [61, 77, 78, 79, 80, 81, 82, 83, 84, 85],
-        puffer: [53, 56, 59, 61, 70, 74, 78, 82, 86, 90],
-        vest: [52, 55, 57, 59, 63, 66, 70, 72, 76, 82],
-        boxyHenley: [54, 56, 58, 64, 66, 68, 70, 76, 78, 84],
-        bottomTailoring: [36, 38, 40, 42, 44, 46, 48, 50, 52, 54],
-        bottomSweat: [36, 38, 40, 42, 44, 46, 48, 50, 52, 54],
-        underwear: [36, 38, 40, 42, 44, 46, 48, 50, 52, 54],
-        quadrilTailoring: [48, 50, 52, 56, 58, 60, 62, 64, 66, 68],
-        quadrilSweat: [48, 50, 52, 54, 56, 58, 60, 62, 64, 66],
-        quadrilUnderwear: [50, 52, 54, 56, 58, 60, 62, 64, 66, 68],
-    };
-
-
-    function detectProduct(name) {
-        const n = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        if (/tailoring/.test(n) || /\d\/\d\s*short/.test(n) || /\b(1\/5|2\/5|3\/5|4\/5)\b/.test(n)) return { category: 'bottom', fit: 'tailoring' };
-        if (/underwear|cueca/.test(n)) return { category: 'bottom', fit: 'underwear' };
-        if (/sweatpant|sweatshort|sweat pant|sweat short|calca|bermuda/.test(n)) return { category: 'bottom', fit: 'sweat' };
-        if (/henley/.test(n)) return { category: 'top', fit: 'boxyHenley' };
-        if (/boxy.*(hoodie|crewneck|crew)/.test(n) || /(hoodie|crewneck|crew).*boxy/.test(n)) return { category: 'top', fit: 'boxyHoodie' };
-        if (/puffer|jacket/.test(n)) return { category: 'top', fit: 'puffer' };
-        if (/vest/.test(n)) return { category: 'top', fit: 'vest' };
-        if (/(hoodie|hoodie zip|half zip|crewneck|crew neck)/.test(n) && !/oversized|boxy|short sleeve/.test(n)) return { category: 'top', fit: 'hoodie' };
-        if (/oversized.*(hoodie|crewneck|crew|short sleeve)/.test(n) || /short sleeve.*(hoodie|crewneck)/.test(n)) return { category: 'top', fit: 'oversizedSS' };
-        if (/oversized|boxy tee|2\/4/.test(n)) return { category: 'top', fit: 'oversized' };
-        return { category: 'top', fit: 'regular' };
-    }
-
-
-    function estimarTorax(altura, peso) {
-        if (altura < 3) altura *= 100;
-        let circ = 0.65 * peso + 56;
-        const imc = peso / Math.pow(altura / 100, 2);
-        if (imc > 30) circ += 4; else if (imc > 25) circ += 2;
-        return circ;
-    }
-
-
-    function findClosest(arr, val) {
-        let idx = 0, minDiff = Infinity;
-        arr.forEach((v, i) => { const d = Math.abs(v - val); if (d < minDiff) { minDiff = d; idx = i; } });
-        return idx;
-    }
-
-
-    let recommendedSize = 'M';
-    let currentProduct = { category: 'top', fit: 'regular' };
-
-    function calculateFinalSize() {
-        // Feature desativada: não faz mais cálculos de tamanho
-        return;
-    }
+    // Produto detectado (óculos = sempre 'top')
+    let currentProduct = { category: 'top', fit: 'glasses' };
+    function detectProduct() { return currentProduct; }
 
 
     // ─── LOCK / UNLOCK SCROLL DA PÁGINA ──────────────────────────────────────────
@@ -1137,24 +1078,12 @@
                 fd.append('api_key', keyToUse);
                 if (pixPaymentId) fd.append('pix_payment_id', pixPaymentId);
 
-                if (currentProduct.category === 'top') {
-                    fd.append('height', '');
-                    fd.append('weight', '');
-                } else {
-                    fd.append('height', '');
-                    fd.append('weight', '');
-                    fd.append('cintura', '');
-                    fd.append('quadril', '');
-                }
-
                 if (prodImg) {
                     try {
                         const b = await fetch(prodImg).then(r => r.blob());
                         fd.append('product_image', b, 'product.jpg');
                     } catch (_) { }
                 }
-
-                calculateFinalSize();
 
                 const res = await fetch(WEBHOOK_PROVA, { method: 'POST', body: fd });
 
