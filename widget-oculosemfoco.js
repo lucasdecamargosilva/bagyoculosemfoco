@@ -1,4 +1,5 @@
 (function () {
+    console.log('[PL] Widget Óculos em Foco carregado | URL:', window.location.pathname);
     // ===============================================
     // 0. CHUMBAR A API KEY AQUI DIRETO NO CÓDIGO
     // ===============================================
@@ -1222,7 +1223,8 @@
     }
 
     // ─── EXECUTA APENAS EM PÁGINAS DE PRODUTO ────────────────────────────────────
-    const isProductPage = window.location.pathname.includes('/products/') || window.location.pathname.includes('/product/') || window.location.pathname.includes('/produtos/') || window.location.pathname.includes('/produto/') || window.location.pathname.includes('/p/') || window.location.pathname.includes('preview.html') || document.querySelector('meta[property="og:type"][content="product"]') || document.querySelector('#form-add-cart') || document.querySelector('.product-action');
+    const isProductPage = window.location.pathname.includes('/products/') || window.location.pathname.includes('/product/') || window.location.pathname.includes('/produtos/') || window.location.pathname.includes('/produto/') || window.location.pathname.includes('/p/') || window.location.pathname.includes('preview.html') || document.querySelector('meta[property="og:type"][content="product"]') || document.querySelector('#form-add-cart') || document.querySelector('.product-action') || document.querySelector('#button-buy') || document.querySelector('[name="variation_id"]');
+    console.log('[PL] É página de produto?', isProductPage);
 
     if (isProductPage) {
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
