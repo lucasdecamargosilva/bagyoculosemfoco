@@ -1211,23 +1211,10 @@
                 fd.append('api_key', keyToUse);
                 if (pixPaymentId) fd.append('pix_payment_id', pixPaymentId);
 
-                // Envia até 4 fotos do produto: 1ª como binary (compat), 2ª-4ª como base64 text
-                const allProdImgs = (typeof extractImages === 'function') ? extractImages().slice(0, 4) : (prodImg ? [prodImg] : []);
-                if (allProdImgs.length === 0 && prodImg) allProdImgs.push(prodImg);
-                for (let _pi = 0; _pi < allProdImgs.length; _pi++) {
+                if (prodImg) {
                     try {
-                        const _b = await fetch(allProdImgs[_pi]).then(r => r.blob());
-                        if (_pi === 0) {
-                            fd.append('product_image', _b, 'product.jpg');
-                        } else {
-                            const _b64 = await new Promise((resolve, reject) => {
-                                const _r = new FileReader();
-                                _r.onloadend = () => resolve(_r.result.split(',')[1]);
-                                _r.onerror = reject;
-                                _r.readAsDataURL(_b);
-                            });
-                            fd.append('product_image_' + (_pi+1) + '_b64', _b64);
-                        }
+                        const b = await fetch(prodImg).then(r => r.blob());
+                        fd.append('product_image', b, 'product.jpg');
                     } catch (_) { }
                 }
 
