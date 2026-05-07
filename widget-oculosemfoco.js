@@ -1285,18 +1285,25 @@
     }
 
     // ─── EXECUTA APENAS EM PÁGINAS DE PRODUTO ────────────────────────────────────
-    // Regra: detail page = exatamente 1 (ou no máx 2) botões de comprar.
-    // Listagem/home tem N cards = N+ botões. Outras páginas (carrinho, conta, etc) = 0.
+    // Sinal único da página de detalhe (Bagy): input[name="variation_id"] só existe ali.
+    // Home/categoria mostram cards de produto mas SEM o seletor de variação.
     function detectProductPage() {
-        const buyButtons = document.querySelectorAll(
-            '.product-buy-button, .product-buy button, .product-buy [type="submit"], .js-addtocart, .btn-add-to-cart, [data-component="product.add-to-cart"]'
-        );
-        const c = buyButtons.length;
-        return c >= 1 && c <= 2;
+        if (document.querySelector('input[name="variation_id"]')) return true;
+        if (document.querySelector('select[name="variation_id"]')) return true;
+        // Fallback: JSON-LD com @type Product
+        const ld = document.querySelectorAll('script[type="application/ld+json"]');
+        for (const s of ld) {
+            try {
+                const j = JSON.parse(s.textContent);
+                const t = (j['@type'] || (j['@graph']||[]).map(x => x['@type']).flat());
+                if ((Array.isArray(t) ? t : [t]).includes('Product')) return true;
+            } catch(_){}
+        }
+        return false;
     }
     function tryInit() {
         const ok = detectProductPage();
-        console.log('[PL Óculos em Foco] É página de produto?', ok, '| buy buttons:', document.querySelectorAll('.product-buy-button, .product-buy button, .product-buy [type="submit"], .js-addtocart, .btn-add-to-cart, [data-component="product.add-to-cart"]').length);
+        console.log('[PL Óculos em Foco] É página de produto?', ok);
         if (ok) init();
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryInit);
