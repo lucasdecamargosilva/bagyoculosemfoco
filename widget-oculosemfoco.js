@@ -1285,12 +1285,21 @@
     }
 
     // ─── EXECUTA APENAS EM PÁGINAS DE PRODUTO ────────────────────────────────────
-    const isProductPage = window.location.pathname.includes('/products/') || window.location.pathname.includes('/product/') || window.location.pathname.includes('/produtos/') || window.location.pathname.includes('/produto/') || window.location.pathname.includes('/p/') || window.location.pathname.includes('preview.html') || document.querySelector('meta[property="og:type"][content="product"]') || document.querySelector('#form-add-cart') || document.querySelector('.product-action') || document.querySelector('#button-buy') || document.querySelector('[name="variation_id"]');
-    console.log('[PL] É página de produto?', isProductPage);
-
-    if (isProductPage) {
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-        else init();
+    // Regra: detail page = exatamente 1 (ou no máx 2) botões de comprar.
+    // Listagem/home tem N cards = N+ botões. Outras páginas (carrinho, conta, etc) = 0.
+    function detectProductPage() {
+        const buyButtons = document.querySelectorAll(
+            '.product-buy-button, .product-buy button, .product-buy [type="submit"], .js-addtocart, .btn-add-to-cart, [data-component="product.add-to-cart"]'
+        );
+        const c = buyButtons.length;
+        return c >= 1 && c <= 2;
     }
+    function tryInit() {
+        const ok = detectProductPage();
+        console.log('[PL Óculos em Foco] É página de produto?', ok, '| buy buttons:', document.querySelectorAll('.product-buy-button, .product-buy button, .product-buy [type="submit"], .js-addtocart, .btn-add-to-cart, [data-component="product.add-to-cart"]').length);
+        if (ok) init();
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryInit);
+    else tryInit();
 
 })();
