@@ -1,3 +1,4 @@
+<script>
 (function () {
     console.log('[PL] Widget Óculos em Foco carregado | URL:', window.location.pathname);
     // ===============================================
@@ -50,12 +51,11 @@
 
         :root {
             --c-bg: #ffffff;
-            --c-surface: #fff8e6;
+            --c-surface: #f7f6f4;
             --c-ink: #111111;
             --c-muted: #999;
-            --c-line: #f0d77a;
-            --c-accent: #f5a623;
-            --c-brand: #f5a623;
+            --c-line: #e8e8e8;
+            --c-accent: #111111;
             --c-danger: #cc3333;
             --font-display: 'Bebas Neue', sans-serif;
             --font-body: 'DM Sans', sans-serif;
@@ -64,14 +64,13 @@
         /* ── Trigger (selo sobre foto) ── */
         @keyframes q-shake { 0%,50%,100%{transform:rotate(0deg)} 10%,30%{transform:rotate(-10deg)} 20%,40%{transform:rotate(10deg)} }
         .q-btn-trigger-ia {
-            position: fixed !important; z-index: 999998 !important;
-            background: none !important; border: none !important; padding: 0 !important; cursor: pointer !important;
-            width: 70px !important; height: 70px !important;
-            display: flex !important; align-items: center !important; justify-content: center !important;
+            position: absolute; top: 14px; right: 14px; z-index: 100;
+            background: none; border: none; padding: 0; cursor: pointer;
+            width: 70px; height: 70px;
+            display: flex; align-items: center; justify-content: center;
             filter: drop-shadow(0 3px 10px rgba(0,0,0,0.22));
             animation: q-shake 3s infinite;
             transition: filter 0.2s;
-            visibility: hidden;
         }
         .q-btn-trigger-ia:hover { filter: drop-shadow(0 6px 18px rgba(0,0,0,0.32)); }
         .q-btn-trigger-ia img { width: 100%; height: 100%; object-fit: contain; }
@@ -219,27 +218,6 @@
         .q-face-frame img { width: 100%; height: 100%; object-fit: cover; display: none; }
         .q-face-placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .q-face-placeholder i { font-size: 72px; color: #d0d0d0; }
-        .q-product-thumbs {
-            display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 8px;
-            -webkit-overflow-scrolling: touch; justify-content: center;
-        }
-        .q-product-thumbs::-webkit-scrollbar { display: none; }
-        .q-product-thumb {
-            flex: 0 0 88px; width: 88px; height: 88px;
-            background: var(--c-surface); border: 2px solid transparent;
-            padding: 0; cursor: pointer; border-radius: 6px;
-            overflow: hidden; transition: border-color 0.2s, transform 0.15s;
-        }
-        .q-product-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .q-product-thumb:hover { transform: scale(1.04); }
-        .q-product-thumb.selected { border-color: var(--c-brand, var(--c-ink)); }
-        .q-product-thumb.selected::after {
-            content: '✓'; position: absolute; transform: translate(-22px, -84px);
-            background: var(--c-brand, var(--c-ink)); color: #fff;
-            width: 18px; height: 18px; border-radius: 50%;
-            font-size: 11px; line-height: 18px; text-align: center;
-            font-weight: 700;
-        }
         /* Corner marks — clean editorial style */
         .q-face-corner {
             position: absolute; width: 20px; height: 20px;
@@ -358,7 +336,7 @@
             font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
             color: var(--c-muted); font-family: var(--font-body);
         }
-        .q-loading-t2 img { height: 16px; width: auto; opacity: 0.7; }
+        .q-loading-t2 img { height: 26px; width: auto; opacity: 0.7; }
         .q-loading-bar { height: 1px; background: var(--c-line); width: 100%; position: relative; overflow: hidden; }
         .q-loading-bar > div {
             position: absolute; top: 0; left: 0; height: 100%; width: 35%;
@@ -504,12 +482,6 @@
                             <div id="q-phone-error" class="q-status-msg">N&#250;mero inv&#225;lido</div>
                         </div>
 
-                        <!-- Product image selector -->
-                        <div id="q-photo-selector-group" style="display:none;margin-bottom:20px;">
-                            <p class="q-section-label">Escolha o &#243;culos para experimentar</p>
-                            <div class="q-product-thumbs"></div>
-                        </div>
-
                         <!-- Photo section -->
                         <p class="q-section-label">Envie sua foto</p>
                         <div class="q-tip-box">
@@ -554,7 +526,6 @@
                     <div id="q-step-pix">
                         <h2>Prova Extra</h2>
                         <p class="q-pix-subtitle">Limite de 3 provas atingido.<br>Pague R$1 via PIX para mais uma:</p>
-                        <p style="font-size: 11px; color: var(--c-muted); margin: 8px 0 0; line-height: 1.5; text-align: center;">&#8505;&#65039; Cobran&#231;a feita pela Provou Levou, n&#227;o pela loja</p>
                         <div class="q-pix-qr"><img id="q-pix-qr-img" alt="QR Code PIX"></div>
                         <div class="q-pix-copiacola">
                             <input type="text" id="q-pix-code" readonly placeholder="C&#243;digo PIX...">
@@ -647,58 +618,31 @@
         openBtn.innerHTML = stampImageHTML;
 
 
-        const imgContainers = ['.product-images', '.product-image-section', '.product-photo', '.gallery-main', '.product-gallery__main', '.product-gallery', '.product-gallery img', '.product-image img', '.product-image-column', '.product-image-main', '[data-component="product.gallery"]', '[data-component="product-images"]', '.swiper-container .swiper-slide-active', '.swiper-slide-active', '.js-product-slide', '.js-swiper-product', '[data-store^="product-image-"]', '.product__media-wrapper', '.product-gallery__media', '.product__media', '.product-media-container', '[data-media-id]', '.product__media-item', '.product-single__media', '.media-gallery'];
+        const imgContainers = ['.product-gallery__main', '.product-gallery img', '.product-image img', '[data-component="product.gallery"]', '.js-product-slide', '.product-image-column', '.js-swiper-product', '[data-store^="product-image-"]', '.product__media-wrapper', '.product-gallery__media', '.product__media', '.product-image-main', '.product-media-container', '[data-media-id]', '.product__media-item', '.product-gallery', '.product-single__media', '.media-gallery'];
 
-        // Anexa ao body com position:fixed e atualiza posição via bounding rect (resiste a breakpoints)
-        document.body.appendChild(openBtn);
-        let trackedImgEl = null;
-
-        function findVisibleImageEl() {
-            // Procura em ordem de prioridade: containers conhecidos com img visível
+        function tryPlaceTriggerBtn() {
+            // 1ª prioridade: container que tenha <img> dentro (evita cair em slide de vídeo)
             for (const sel of imgContainers) {
                 const els = document.querySelectorAll(sel);
                 for (const el of els) {
-                    const rect = el.getBoundingClientRect();
-                    const visible = rect.width > 50 && rect.height > 50 && window.getComputedStyle(el).visibility !== 'hidden' && window.getComputedStyle(el).display !== 'none';
-                    if (!visible) continue;
-                    const img = el.tagName === 'IMG' ? el : el.querySelector('img');
-                    if (img) return el;
+                    if (el.querySelector('img')) {
+                        if (window.getComputedStyle(el).position === 'static') el.style.position = 'relative';
+                        el.appendChild(openBtn);
+                        return true;
+                    }
                 }
             }
-            // Fallback: qualquer img grande na página de produto
-            for (const img of document.querySelectorAll('img')) {
-                const rect = img.getBoundingClientRect();
-                if (rect.width > 200 && rect.height > 200) return img;
+            // 2ª prioridade: qualquer container correspondente
+            for (const sel of imgContainers) {
+                const el = document.querySelector(sel);
+                if (el) {
+                    if (window.getComputedStyle(el).position === 'static') el.style.position = 'relative';
+                    el.appendChild(openBtn);
+                    return true;
+                }
             }
-            return null;
+            return false;
         }
-
-        function updateTriggerPosition() {
-            const target = findVisibleImageEl();
-            if (!target) {
-                openBtn.style.visibility = 'hidden';
-                return false;
-            }
-            trackedImgEl = target;
-            const rect = target.getBoundingClientRect();
-            const btnSize = 70;
-            const margin = 14;
-            // Posiciona no canto superior direito da imagem
-            openBtn.style.top = (rect.top + margin) + 'px';
-            openBtn.style.left = (rect.right - btnSize - margin) + 'px';
-            openBtn.style.visibility = 'visible';
-            return true;
-        }
-
-        function tryPlaceTriggerBtn() {
-            return updateTriggerPosition();
-        }
-
-        // Atualiza posição em scroll/resize
-        window.addEventListener('scroll', updateTriggerPosition, { passive: true });
-        window.addEventListener('resize', updateTriggerPosition);
-        // Re-checa periodicamente caso DOM mude
-        setInterval(updateTriggerPosition, 1000);
 
         if (!tryPlaceTriggerBtn()) {
             // Container não pronto ainda (ex: após F5 no mobile).
@@ -755,12 +699,9 @@
         });
 
         // Posiciona acima do botão de compra
-        const buyBtn = document.querySelector('.product-buy-button, .product-buy button, .product-buy [type="submit"], .js-addtocart, .btn-add-to-cart, [data-component="product.add-to-cart"]');
+        const buyBtn = document.querySelector('.js-addtocart, .btn-add-to-cart, [data-component="product.add-to-cart"]');
         if (buyBtn) {
-            let target = buyBtn;
-            const buyContainer = buyBtn.closest('.product-buy, .row');
-            if (buyContainer && buyContainer.parentNode) target = buyContainer;
-            target.parentNode.insertBefore(inlineBtn, target);
+            buyBtn.parentNode.insertBefore(inlineBtn, buyBtn);
         } else {
             const variantsContainer = document.querySelector('.js-product-variants');
             if (variantsContainer) {
@@ -843,44 +784,14 @@
                 const og = document.querySelector('meta[property="og:image"]')?.content;
                 if (og) uniqueImgs.push(upgradeImgUrl(og));
             }
-            return uniqueImgs.slice(0, 4);
+            return uniqueImgs.slice(0, 2);
         }
 
         function populateImageSelector() {
             const imgs = extractImages();
             const group = document.getElementById('q-photo-selector-group');
-            if (!group) {
-                selectedProductImgUrl = imgs[0] || '';
-                return;
-            }
-            // Se tem 0 ou 1 imagem, esconde o seletor
-            if (imgs.length < 2) {
-                group.style.display = 'none';
-                selectedProductImgUrl = imgs[0] || '';
-                return;
-            }
-            // Limpa thumbs anteriores
-            const grid = group.querySelector('.q-product-thumbs');
-            grid.innerHTML = '';
-            selectedProductImgUrl = imgs[0];
-            imgs.forEach((src, idx) => {
-                const thumb = document.createElement('button');
-                thumb.type = 'button';
-                thumb.className = 'q-product-thumb' + (idx === 0 ? ' selected' : '');
-                thumb.dataset.url = src;
-                const img = document.createElement('img');
-                img.src = src;
-                img.alt = 'Foto ' + (idx + 1);
-                img.loading = 'lazy';
-                thumb.appendChild(img);
-                thumb.addEventListener('click', () => {
-                    grid.querySelectorAll('.q-product-thumb').forEach(t => t.classList.remove('selected'));
-                    thumb.classList.add('selected');
-                    selectedProductImgUrl = src;
-                });
-                grid.appendChild(thumb);
-            });
-            group.style.display = 'block';
+            if (group) group.style.display = 'none';
+            selectedProductImgUrl = imgs[0] || '';
         }
 
         function openModal() {
@@ -949,72 +860,38 @@
             var section = document.getElementById('q-related-products');
             if (!grid || !section) return;
 
-            // Bagy/Dooca: #product-related com .col-6 / Nuvemshop: outros padrões
-            var sel = [
-                '#product-related .col-6, #product-related .col-md-3',
-                '#product-related .product-card', '#product-related .card-product', '#product-related .product-item',
-                '.product-related .col-6, .product-related .col-md-3',
-                '.product-related .product-card', '.product-related .card-product', '.product-related .product-item',
-                '.related-products .product-card', '.related-products .card-product', '.related-products .product-item',
-                '[data-component="products.list"] .product-item',
-                '.js-swiper-related .js-item-product',
-                '.js-item-product',
-                '.product-card', '.card-product'
-            ];
-            var items = [];
-            for (var i = 0; i < sel.length && !items.length; i++) {
-                items = document.querySelectorAll(sel[i]);
-            }
-            if (!items.length) {
-                console.log('[PL] Nenhum produto relacionado encontrado');
-                return;
-            }
-
+            var items = document.querySelectorAll('.product-related .product-item, .related-products .product-item, [data-component="products.list"] .product-item');
+            if (!items.length) items = document.querySelectorAll('.js-swiper-related .js-item-product');
+            if (!items.length) items = document.querySelectorAll('.js-item-product');
             var products = [];
-            var prodHref = window.location.pathname;
 
             items.forEach(function(item) {
-                if (products.length >= 4) return;
+                if (products.length >= 3) return;
+                var container = item.querySelector('[data-variants]');
+                if (!container) return;
                 try {
-                    // 1) Link
-                    var linkEl = item.querySelector('a[href]') || (item.tagName === 'A' ? item : null);
+                    var variants = JSON.parse(container.getAttribute('data-variants'));
+                    if (!variants || !variants.length) return;
+                    var v = variants[0];
+                    var imgRaw = v.image_url || '';
+                    var img = imgRaw ? 'https:' + imgRaw.replace(/\\/g, '').replace('-1024-1024.webp', '-480-0.webp') : '';
+                    var price = v.price_short || '';
+                    // Name from img alt (Nuvemshop sets it reliably)
+                    var imgEl = item.querySelector('img[alt]');
+                    var name = imgEl ? imgEl.getAttribute('alt').trim() : '';
+                    // Link from any anchor pointing to /produtos/
+                    var linkEl = item.querySelector('a[href*="/produtos/"]');
                     var link = linkEl ? linkEl.getAttribute('href') : '';
-                    if (!link || link === '#' || link === prodHref) return; // ignora link inválido ou o produto atual
-
-                    // 2) Imagem
-                    var imgEl = item.querySelector('img');
-                    var img = '';
-                    if (imgEl) {
-                        img = imgEl.getAttribute('src') || imgEl.getAttribute('data-src') || imgEl.getAttribute('data-original') || '';
-                        // srcset fallback
-                        if (!img) {
-                            var srcset = imgEl.getAttribute('srcset') || imgEl.getAttribute('data-srcset');
-                            if (srcset) img = srcset.split(',')[0].trim().split(' ')[0];
-                        }
-                    }
-                    if (!img) return;
-
-                    // 3) Nome — tenta multiplos seletores
-                    var nameEl = item.querySelector('.product-name, .card-product-name, .product-title, .card-title, h3, h4, [class*="name"]');
-                    var name = nameEl ? nameEl.textContent.trim() : (imgEl && imgEl.alt ? imgEl.alt.trim() : '');
-
-                    // 4) Preço — tenta multiplos seletores
-                    var priceEl = item.querySelector('.product-price-final .total, .product-price-final .price, .product-price .total, .price-final, .product-price, .card-product-price, [class*="price"]');
-                    var price = priceEl ? priceEl.textContent.trim().replace(/\s+/g, ' ') : '';
-
-                    if (img && name) {
+                    if (img && (name || price)) {
                         products.push({ name: name, img: img, price: price, link: link });
                     }
                 } catch(e) {}
             });
 
-            if (!products.length) {
-                console.log('[PL] Nenhum produto extraído com sucesso');
-                return;
-            }
+            if (!products.length) return;
 
             while (grid.firstChild) grid.removeChild(grid.firstChild);
-            products.slice(0, 4).forEach(function(p) {
+            products.forEach(function(p) {
                 var a = document.createElement('a');
                 a.className = 'q-related-card';
                 a.href = p.link || '#';
@@ -1028,18 +905,9 @@
                 nameEl.textContent = p.name;
                 a.appendChild(img);
                 a.appendChild(nameEl);
-                if (p.price) {
-                    var priceEl = document.createElement('span');
-                    priceEl.className = 'q-related-card-name';
-                    priceEl.style.color = 'var(--c-brand)';
-                    priceEl.style.fontWeight = '700';
-                    priceEl.textContent = p.price;
-                    a.appendChild(priceEl);
-                }
                 grid.appendChild(a);
             });
             section.style.display = 'block';
-            console.log('[PL] ' + products.length + ' produtos relacionados carregados');
         }
 
         function showError() {
@@ -1294,3 +1162,5 @@
     }
 
 })();
+
+</script>
