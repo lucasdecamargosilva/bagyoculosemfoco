@@ -9,7 +9,7 @@
     const WEBHOOK_PROVA = 'https://n8n.segredosdodrop.com/webhook/gerador-oculos';
     const WEBHOOK_PIX = 'https://n8n.segredosdodrop.com/webhook/cacife-pix';
     const WEBHOOK_PIX_STATUS = 'https://n8n.segredosdodrop.com/webhook/cacife-pix-status';
-    const WEBHOOK_CHECK_LIMIT = 'https://n8n.segredosdodrop.com/webhook/oculosemfoco-check-limit';
+    // WEBHOOK_CHECK_LIMIT removido — sem limite por agora
     // Produto detectado (óculos = sempre 'top')
     let currentProduct = { category: 'top', fit: 'glasses' };
     function detectProduct() { return currentProduct; }
@@ -1290,21 +1290,6 @@
             const phone = '55' + phoneInput.value.replace(/\D/g, '');
             genBtn.disabled = true;
 
-            try {
-                const resp = await fetch(WEBHOOK_CHECK_LIMIT, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone })
-                });
-                const data = await resp.json();
-                if (data.limited) {
-                    genBtn.disabled = false;
-                    createPixAndPoll();
-                    return;
-                }
-            } catch (_) {
-                // se o check falhar, deixa gerar (evita bloquear por erro de rede)
-            }
 
             genBtn.disabled = false;
             runGeneration();
