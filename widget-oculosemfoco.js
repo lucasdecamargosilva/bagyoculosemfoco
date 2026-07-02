@@ -28,6 +28,42 @@
     const WEBHOOK_PIX = 'https://n8n.segredosdodrop.com/webhook/cacife-pix';
     const WEBHOOK_PIX_STATUS = 'https://n8n.segredosdodrop.com/webhook/cacife-pix-status';
     const WEBHOOK_CHECK_LIMIT = 'https://n8n.segredosdodrop.com/webhook/oculosemfoco-check-limit';
+    const WEBHOOK_BUY_CLICK = 'https://n8n.segredosdodrop.com/webhook/pl-provador-buy-click';
+
+    // ── Botão "Comprar Agora" no resultado (Bagy/Dooca) ─────────────────────────
+    // Preço FINAL que o cliente paga (window.dooca.product.price já vem com desconto).
+    function getMainPrice() {
+        try {
+            var dp = window.dooca && window.dooca.product ? window.dooca.product.price : null;
+            if (typeof dp === 'number' && dp > 0) return 'R$ ' + dp.toFixed(2).replace('.', ',');
+        } catch (e) {}
+        var el = document.querySelector('.product-price-final, .price, [data-price]');
+        var t = el ? (el.textContent || '').trim() : '';
+        if (t && /\d/.test(t)) return t.replace(/\s+/g, ' ');
+        return '';
+    }
+    function findStoreBuyBtn() {
+        return document.querySelector('.product-buy-button, .product-buy button, .product-buy [type="submit"]');
+    }
+    function buyNow() {
+        try {
+            var _tp = (document.getElementById('q-phone') || {}).value || '';
+            var _td = (document.querySelector('h1.product-detail-info-name, h1') || {}).innerText || document.title || '';
+            fetch(WEBHOOK_BUY_CLICK, { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: _tp, origin: location.origin, produto: _td }) }).catch(function () {});
+        } catch (e) {}
+        var sb = findStoreBuyBtn();
+        if (sb) { try { sb.click(); } catch (e) {} }
+    }
+    function populateBuyCta() {
+        var btn = document.getElementById('q-btn-buy-now');
+        if (!btn) return;
+        var pr = btn.querySelector('.q-buy-price');
+        var price = getMainPrice();
+        if (pr) pr.textContent = price || '';
+        btn.style.display = findStoreBuyBtn() ? 'flex' : 'none';
+        btn.onclick = buyNow;
+    }
+
     // Produto detectado (óculos = sempre 'top')
     let currentProduct = { category: 'top', fit: 'glasses' };
     function detectProduct() { return currentProduct; }
@@ -352,6 +388,16 @@
             cursor: pointer; transition: border-color 0.2s, background 0.2s; box-sizing: border-box;
         }
         .q-btn-outline:hover { border-color: var(--c-ink); background: var(--c-surface); }
+        .q-btn-buy-now {
+            width: 100%; padding: 16px 18px; margin-bottom: 10px;
+            background: var(--c-ink); color: #fff; border: 1px solid var(--c-ink);
+            border-radius: 14px; font-family: var(--font-body);
+            font-weight: 700; font-size: 15px; letter-spacing: .3px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: opacity .2s; box-sizing: border-box; line-height: 1.2;
+        }
+        .q-btn-buy-now:hover { opacity: .85; }
+        .q-btn-buy-now .q-buy-price { font-weight: 800; white-space: nowrap; }
 
         /* ── PIX screen ── */
         #q-step-pix {
@@ -639,6 +685,7 @@
                             <img id="q-final-view-img">
                         </div>
                         <div id="q-result-actions-col">
+                            <button class="q-btn-buy-now" id="q-btn-buy-now" style="display:none;">Comprar Agora <span class="q-buy-price"></span></button>
                             <button class="q-btn-outline" id="q-btn-back">Voltar ao Produto</button>
                             <button class="q-btn-black q-res-mobile-only" id="q-retry-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;">
                                 <i class="ph ph-camera"></i> Tentar outra foto
@@ -1423,6 +1470,7 @@ const fd = new FormData();
                     document.getElementById('q-final-view-img').src = URL.createObjectURL(blob);
                     document.querySelector('.q-card-ia').classList.add('is-result');
                     document.getElementById('q-step-result').style.display = 'flex';
+                    try { populateBuyCta(); } catch (e) {}
                     loadRelatedProducts();
                 } else if (res.status === 401 || res.status === 403) {
                     document.getElementById('q-loading-box').style.display = 'none';
