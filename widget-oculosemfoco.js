@@ -631,7 +631,7 @@
 
 
     // ─── IMAGEM DO BOTÃO (trigger) ─────────────────────────────────────────────
-    const stampImageHTML = `<img src="https://cdn.shopify.com/s/files/1/0636/6334/1746/files/logo_provador.png?v=1772494793" alt="Provador Virtual" style="width:100%;height:100%;object-fit:contain;">`;
+    const stampImageHTML = `<img src="https://i.ibb.co/DPfS7yFj/botao-rochelle-1-removebg-preview.png" alt="Provador Virtual" style="width:100%;height:100%;object-fit:contain;">`;
 
 
 
